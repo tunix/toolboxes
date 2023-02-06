@@ -25,6 +25,10 @@ jobs:
           image: ${{ env.IMAGE_REGISTRY }}/pengutool
           oci: true
 
+      - name: Echo outputs
+        run: |
+          echo "${{ toJSON(steps.build_image.outputs) }}"
+
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
         id: push_image
@@ -61,6 +65,10 @@ jobs:
             ./scanner/Containerfile
           image: ${{ env.IMAGE_REGISTRY }}/scanner
           oci: true
+
+      - name: Echo outputs
+        run: |
+          echo "${{ toJSON(steps.build_image.outputs) }}"
 
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
