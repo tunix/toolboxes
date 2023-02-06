@@ -25,10 +25,6 @@ jobs:
           image: ${{ env.IMAGE_REGISTRY }}/pengutool
           oci: true
 
-      - name: Echo outputs
-        run: |
-          echo "${{ toJSON(steps.build_image.outputs) }}"
-
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
         id: push_image
@@ -36,7 +32,7 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_PASSWORD: ${{ github.token }}
         with:
-          image: ${{ steps.build_image.outputs.image }}
+          image: pengutool
           registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
@@ -66,10 +62,6 @@ jobs:
           image: ${{ env.IMAGE_REGISTRY }}/scanner
           oci: true
 
-      - name: Echo outputs
-        run: |
-          echo "${{ toJSON(steps.build_image.outputs) }}"
-
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
         id: push_image
@@ -77,7 +69,7 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_PASSWORD: ${{ github.token }}
         with:
-          image: ${{ steps.build_image.outputs.image }}
+          image: scanner
           registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
