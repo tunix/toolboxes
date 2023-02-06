@@ -1,0 +1,83 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build-pengutool:
+    name: build-pengutool
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Build image
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./pengutool/Containerfile
+          image: ${{ env.IMAGE_REGISTRY }}/pengutool
+          oci: true
+
+      - name: Push image
+        uses: redhat-actions/push-to-registry@v2
+        id: push_image
+        env:
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_PASSWORD: ${{ github.token }}
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+          extra-args: |
+            --disable-content-trust
+
+      # TODO: sign image using cosign
+
+      - name: Echo outputs
+        run: |
+          echo "${{ toJSON(steps.push_image.outputs) }}"
+
+  build-scanner:
+    name: build-scanner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Build image
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./scanner/Containerfile
+          image: ${{ env.IMAGE_REGISTRY }}/scanner
+          oci: true
+
+      - name: Push image
+        uses: redhat-actions/push-to-registry@v2
+        id: push_image
+        env:
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_PASSWORD: ${{ github.token }}
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+          extra-args: |
+            --disable-content-trust
+
+      # TODO: sign image using cosign
+
+      - name: Echo outputs
+        run: |
+          echo "${{ toJSON(steps.push_image.outputs) }}"
