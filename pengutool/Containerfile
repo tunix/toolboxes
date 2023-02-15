@@ -19,8 +19,6 @@ RUN dnf install -y \
     podman-compose \
     bind-utils \
     telnet \
-    nodejs \
-    npm \
     asciinema \
     ripgrep \
     fzf
