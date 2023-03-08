@@ -21,4 +21,5 @@ RUN dnf install -y \
     telnet \
     asciinema \
     ripgrep \
-    fzf
+    fzf \
+    pinentry
