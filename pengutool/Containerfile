@@ -1,0 +1,40 @@
+FROM registry.fedoraproject.org/fedora-toolbox:38
+
+RUN dnf install -y \
+    @development-tools \
+    gcc-c++ \
+    glibc-langpack-tr \
+    moreutils \
+    neofetch \
+    httpie \
+    neovim \
+    htop \
+    btop \
+    exa \
+    jq \
+    the_silver_searcher \
+    bat \
+    fish \
+    bind-utils \
+    telnet \
+    asciinema \
+    ripgrep \
+    fzf \
+    pinentry \
+    java-17-openjdk-headless \
+    python3-psutil \
+    python3-gobject \
+    ansible
+
+RUN ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/distrobox \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/podman \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/toolbox \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/dconf \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/flatpak \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/rpm-ostree \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/xdg-open \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/xdg-settings \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/gnome-extensions \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/dbus-send \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/just \
+    && ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/op

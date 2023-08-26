@@ -1,0 +1,71 @@
+name: build
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        toolbox:
+          - pengutool
+
+    env:
+      IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/${{ matrix.toolbox }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Build image
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: ./${{ matrix.toolbox }}/Containerfile
+          image: ${{ env.IMAGE_TAG }}
+          oci: false
+
+      - name: Push image
+        uses: redhat-actions/push-to-registry@v2
+        id: push_image
+        env:
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_PASSWORD: ${{ github.token }}
+        with:
+          image: ${{ matrix.toolbox }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: sigstore/cosign-installer@v3.1.1
+
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          COSIGN_EXPERIMENTAL: false
+          DIGEST: ${{ steps.push_image.outputs.digest }}
+        run: cosign sign --yes "${{ env.IMAGE_TAG }}@${DIGEST}"
+
+      - name: Echo outputs
+        run: echo "${{ toJSON(steps.push_image.outputs) }}"
